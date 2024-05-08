@@ -7,7 +7,7 @@ export class categoryService {
     public async addCategory(category: Icategory, adminId: String): Promise<String> {
         if(!category.category){
             return constants.ENTER_VALID_VALUES;
-        }
+        }                                                                                       
         const newCategory = new Category({ category: category.category, createdBy: adminId });
         await newCategory.save();
         return constants.CATEGORY_ADDED;
