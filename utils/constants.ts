@@ -23,4 +23,6 @@ export class constants{
     static MISSING_TOKEN = 'Unauthorized: Missing Token';
     static AUTHOR_SIGNUP = "Sign up succesfull!";
     static ENTER_VALID_VALUES = "Please enter valid values!";
+    static SUCCESS_STATUS_CODE = 200;
+    static ADMIN_LOGIN = 'Admin login successfull!';
 }

@@ -4,39 +4,54 @@ import { constants } from '../utils/constants';
 
 export class categoryService {
 
-    public async addCategory(category: Icategory, adminId: String): Promise<String> {
-        if(!category.category){
-            return constants.ENTER_VALID_VALUES;
-        }                                                                                       
+    public async addCategory(category: Icategory, adminId: String): Promise<{ statusCode: number, message: string }> {
+        let statusCode: number, message: string;
+        if (!category.category) {
+            statusCode = constants.ERROR_STATUS_CODE;
+            message = constants.ENTER_VALID_VALUES;
+            return { statusCode, message };
+        }
         const newCategory = new Category({ category: category.category, createdBy: adminId });
         await newCategory.save();
-        return constants.CATEGORY_ADDED;
+        statusCode = constants.SUCCESS_STATUS_CODE;
+        message = constants.CATEGORY_ADDED;
+        return { statusCode, message };
     }
 
-    public async getAllCategory(): Promise<Icategory[]> {
-        const categories = await Category.find();
-        return categories;
+    public async getAllCategory(): Promise<{ allCategories: Icategory[], statusCode: number }> {
+        const allCategories = await Category.find();
+        const statusCode: number = constants.SUCCESS_STATUS_CODE;
+        return { allCategories, statusCode };
     }
 
-    public async updateCategory(category: Icategory, categoryId: String, adminId: String): Promise<String> {
+    public async updateCategory(category: Icategory, categoryId: String, adminId: String): Promise<{ statusCode: number, message: string }> {
 
         const isCategory = await Category.findOne({ _id: categoryId });
-
+        let statusCode: number, message: string;
         if (!isCategory) {
-            return constants.CATEGORY_NOT_EXISTS;
+            statusCode = constants.ERROR_STATUS_CODE;
+            message = constants.CATEGORY_NOT_EXISTS;
+            return { statusCode, message };
         }
         await Category.findOneAndUpdate({ _id: categoryId }, { $set: { category: category.category, updatedBy: adminId } }, { new: true });
-        return constants.CATEGORY_UPDATED;
+        statusCode = constants.SUCCESS_STATUS_CODE;
+        message = constants.CATEGORY_UPDATED;
+        return { statusCode, message };
     }
 
-    public async deleteCategory(categoryId: String): Promise<String> {
+    public async deleteCategory(categoryId: String): Promise<{ statusCode: number, message: string }> {
         const isCategory = await Category.findOne({ _id: categoryId });
+        let statusCode: number, message: string;
 
         if (!isCategory) {
-            return constants.CATEGORY_NOT_EXISTS;
+            statusCode = constants.ERROR_STATUS_CODE;
+            message = constants.CATEGORY_NOT_EXISTS;
+            return { statusCode, message };
         }
         await Category.findOneAndDelete({ _id: categoryId });
-        return constants.CATEGORY_DELETED;
+        statusCode = constants.SUCCESS_STATUS_CODE;
+        message = constants.CATEGORY_DELETED;
+        return { statusCode, message };
     }
 
     public async getAllCategoryPaginated(page: number = 1, limit: number = 10, searchQuery?: string, filters?: any): Promise<{ categories: Icategory[], totalCategories: number }> {

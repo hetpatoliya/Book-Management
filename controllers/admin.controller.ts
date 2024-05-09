@@ -9,8 +9,8 @@ export class adminController {
 
     public async signUp(req: Request, res: Response): Promise<void> {
         try {
-            const data = await admins.signUp(req.body);
-            res.json({ message: data });
+            const { statusCode, message } = await admins.signUp(req.body);
+            res.status(statusCode).json({ message: message });
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS, message: error.message
@@ -20,8 +20,8 @@ export class adminController {
 
     public async login(req: Request, res: Response): Promise<void> {
         try {
-            const data = await admins.login(req.body);
-            res.json({ message: data });
+            const { statusCode, message, token } = await admins.login(req.body);
+            res.status(statusCode).json({ message: message, token: token !== null ? token : null });
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS, message: error.message

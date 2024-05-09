@@ -4,26 +4,36 @@ import { constants } from '../utils/constants';
 
 export class authorService {
 
-    public async createAuthor(author: Iauthor, adminId: String): Promise<String> {
+    public async createAuthor(author: Iauthor, adminId: String): Promise<{ statusCode: number, message: String }> {
 
-        if(!author.name || !author.biography || !author.nationality){
-            return constants.ENTER_VALID_VALUES;
+        let statusCode: number, message: String;
+
+        if (!author.name || !author.biography || !author.nationality) {
+            statusCode = constants.ERROR_STATUS_CODE
+            message = constants.ENTER_VALID_VALUES
+            return { statusCode, message };
         }
         const newAuthor = new Author({ name: author.name, biography: author.biography, nationality: author.nationality, createdBy: adminId })
         await newAuthor.save();
-        return constants.AUTHOR_CREATED;
+        statusCode = constants.SUCCESS_STATUS_CODE;
+        message = constants.AUTHOR_CREATED;
+        return { statusCode, message };
     }
 
-    public async getAllAuthors(): Promise<Iauthor[]> {
-        const authors = await Author.find();
-        return authors;
+    public async getAllAuthors(): Promise<{ allAuthors: Iauthor[], statusCode: number }> {
+        const allAuthors = await Author.find();
+        const statusCode = constants.SUCCESS_STATUS_CODE;
+        return { allAuthors, statusCode };
     }
 
-    public async updateAuthor(author: Iauthor, authorId: String, adminId: String): Promise<String> {
+    public async updateAuthor(author: Iauthor, authorId: String, adminId: String): Promise<{ statusCode: number, message: string }> {
         let isAuthor = await Author.findOne({ _id: authorId });
+        let statusCode: number, message: string;
 
         if (!isAuthor) {
-            return constants.AUTHOR_NOT_EXISTS;
+            statusCode = constants.ERROR_STATUS_CODE;
+            message = constants.AUTHOR_NOT_EXISTS;
+            return { statusCode, message };
         }
 
         isAuthor = await Author.findOneAndUpdate({ _id: authorId }, {
@@ -33,43 +43,28 @@ export class authorService {
                 nationality: author.nationality,
                 updatedBy: adminId
             }
-        }, { new: true })
-        return constants.AUTHOR_UPDATED;
+        }, { new: true });
+        statusCode = constants.SUCCESS_STATUS_CODE;
+        message = constants.AUTHOR_UPDATED;
+        return { statusCode, message };
     }
 
-    public async deleteAuthor(authorId: String): Promise<String> {
+    public async deleteAuthor(authorId: String): Promise<{ statusCode: number, message: string }> {
 
         const isAuthor = await Author.findOne({ _id: authorId });
+        let statusCode: number, message: string;
 
         if (!isAuthor) {
-            return constants.AUTHOR_NOT_EXISTS;
+            statusCode = constants.ERROR_STATUS_CODE
+            message = constants.AUTHOR_NOT_EXISTS;
+            return { statusCode, message };
         }
 
+        statusCode = constants.SUCCESS_STATUS_CODE;
+        message = constants.AUTHOR_DELETED;
         await Author.findOneAndDelete({ _id: authorId });
-        return constants.AUTHOR_DELETED;
+        return { statusCode, message };
     }
-
-    // public async getAllAuthorsPaginated(page: number, limit: number): Promise<Iauthor[]> {
-    //     const skip = (page - 1) * limit;
-    //     const authors = await Author.find().skip(skip).limit(limit);
-    //     return authors;
-    // }
-
-    // public async searchAuthors(query: string): Promise<Iauthor[]> {
-    //     const searchResults = await Author.find({
-    //         $or: [
-    //             { name: { $regex: query, $options: 'i' } },
-    //             { biography: { $regex: query, $options: 'i' } },
-    //             { nationality: { $regex: query, $options: 'i' } }
-    //         ]
-    //     });
-    //     return searchResults;
-    // }
-
-    // async filterAuthorsByNationality(nationality: string): Promise<Iauthor[]> {
-    //     const filteredAuthors = await Author.find({ nationality });
-    //     return filteredAuthors;
-    // }
 
     public async getAllAuthorsPaginated(page: number = 1, limit: number = 10, searchQuery?: string, filters?: any): Promise<{ authors: Iauthor[], totalAuthors: number }> {
         let query: any = {};
@@ -80,9 +75,6 @@ export class authorService {
             if (filters.nationality) {
                 query.nationality = filters.nationality;
             }
-            // if (filters.biography) {
-            //     query.biography = filters.biography;
-            // }
         }
 
         const authors = await Author.find(query)
@@ -94,10 +86,4 @@ export class authorService {
 
         return { authors, totalAuthors };
     }
-
-    // public async signUpAuthor(author:Iauthor,authorId:String):Promise<String>{
-    //     const isAuthorHasUsername = await Author.findOne({_id:authorId});
-    //     if(isAuthorHasUsername.username)
-    //     return constants.AUTHOR_SIGNUP;
-    // }
 }

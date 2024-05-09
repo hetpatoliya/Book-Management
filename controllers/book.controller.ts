@@ -10,8 +10,8 @@ export class bookController {
     public async addBook(req: adminIdextended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
-            const data = await books.addBook(req.body, adminId!);
-            res.json({ message: data });
+            const { statusCode, message } = await books.addBook(req.body, adminId!);
+            res.status(statusCode).json({ message: message });
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -22,8 +22,8 @@ export class bookController {
 
     public async retrieveBook(req: Request, res: Response): Promise<void> {
         try {
-            const data = await books.retrieveBook();
-            res.json({ message: data });
+            const { allBooks, statusCode } = await books.retrieveBook();
+            res.status(statusCode).json({ message: allBooks });
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -36,8 +36,8 @@ export class bookController {
         try {
             const adminId = req.adminId;
             const bookId = req.params.bookId;
-            const data = await books.updateBook(req.body, bookId, adminId!);
-            res.json({ message: data });
+            const { statusCode, message } = await books.updateBook(req.body, bookId, adminId!);
+            res.status(statusCode).json({ message: message });
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -49,8 +49,8 @@ export class bookController {
     public async deleteBook(req: Request, res: Response) {
         try {
             const bookId = req.params.bookId;
-            const data = await books.deleteBook(bookId!);
-            res.json({ message: data });
+            const { statusCode, message } = await books.deleteBook(bookId!);
+            res.status(statusCode).json({ message: message });
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -58,49 +58,6 @@ export class bookController {
             });
         }
     }
-
-    public async getAllBooks(req: Request, res: Response): Promise<void> {
-        try {
-            const page = req.query.page ? parseInt(req.query.page as string) : 1;
-            const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-
-            const data = await books.getAllBooksPaginated(page, limit);
-            res.json({ message: data });
-        } catch (error: any) {
-            res.status(constants.ERROR_STATUS_CODE).json({
-                status: constants.ERROR_STATUS,
-                message: error.message
-            });
-        }
-    }
-
-    // public async searchBooks(req: adminIdextended, res: Response): Promise<void> {
-    //     try {
-    //         const bookId = req.params.bookId;
-    //         const query = req.query.q as string;
-
-    //         const searchResults = await books.searchBooks(bookId, query);
-    //         res.status(200).json(searchResults);
-    //     } catch (error) {
-    //         res.status(401).json({
-    //             status: 'fail',
-    //             message: error.message
-    //         });
-    //     }
-    // }
-
-    // public async filterBooksByCategory(req: bookIdextended, res: Response): Promise<void> {
-    //     try {
-    //         const category = req.query.category as string;
-    //         const filteredBooks = await books.filterBooksByCategory(category);
-    //         res.json(filteredBooks);
-    //     } catch (error) {
-    //         res.status(401).json({
-    //             status: 'fail',
-    //             message: error.message
-    //         });
-    //     }
-    // }
 
     public async getAllBooksPaginated(req: Request, res: Response): Promise<void> {
         try {
@@ -118,7 +75,7 @@ export class bookController {
 
             const data = await books.getAllBooksPaginated(parsedPage, parsedLimit, searchQuery as string, parsedFilters);
 
-            res.json(data);
+            res.status(constants.SUCCESS_STATUS_CODE).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
