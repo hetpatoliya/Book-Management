@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import { adminIdextended, bookIdextended } from '../interfaces/other.interface';
-import { bookService } from "../services/book.service";
+import { AuthorService } from "../services/author.service";
+import { IRequestExtended } from "../interfaces/Other";
 import { constants } from "../utils/constants";
 
-const books = new bookService();
+const authorService = new AuthorService();
 
-export class bookController {
+export class AuthorController {
 
-    public async addBook(req: adminIdextended, res: Response): Promise<void> {
+    public async createAuthor(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
-            const { statusCode, message } = await books.addBook(req.body, adminId!);
-            res.status(statusCode).json({ message: message });
+            const data = await authorService.createAuthor(req.body, adminId!);
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -20,10 +20,10 @@ export class bookController {
         }
     }
 
-    public async retrieveBook(req: Request, res: Response): Promise<void> {
+    public async getAllAuthors(req: Request, res: Response): Promise<void> {
         try {
-            const { allBooks, statusCode } = await books.retrieveBook();
-            res.status(statusCode).json({ message: allBooks });
+            const data = await authorService.getAllAuthors();
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -32,12 +32,12 @@ export class bookController {
         }
     }
 
-    public async updateBook(req: adminIdextended, res: Response): Promise<void> {
+    public async updateAuthor(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
-            const bookId = req.params.bookId;
-            const { statusCode, message } = await books.updateBook(req.body, bookId, adminId!);
-            res.status(statusCode).json({ message: message });
+            const authorId = req.params.authorId;
+            const data = await authorService.updateAuthor(req.body, authorId, adminId!);
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -46,11 +46,11 @@ export class bookController {
         }
     }
 
-    public async deleteBook(req: Request, res: Response) {
+    public async deleteAuthor(req: Request, res: Response): Promise<void> {
         try {
-            const bookId = req.params.bookId;
-            const { statusCode, message } = await books.deleteBook(bookId!);
-            res.status(statusCode).json({ message: message });
+            const authorId = req.params.authorId;
+            const data = await authorService.deleteAuthor(authorId);
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -59,7 +59,7 @@ export class bookController {
         }
     }
 
-    public async getAllBooksPaginated(req: Request, res: Response): Promise<void> {
+    public async getAllAuthorsPaginated(req: Request, res: Response): Promise<void> {
         try {
             const { page, limit, filters } = req.query;
             const parsedPage = page ? parseInt(page as string, 10) : 1;
@@ -72,9 +72,7 @@ export class bookController {
             } else {
                 parsedFilters = filters;
             }
-
-            const data = await books.getAllBooksPaginated(parsedPage, parsedLimit, searchQuery as string, parsedFilters);
-
+            const data = await authorService.getAllAuthorsPaginated(parsedPage, parsedLimit, searchQuery as string, parsedFilters);
             res.status(constants.SUCCESS_STATUS_CODE).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({

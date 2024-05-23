@@ -9,5 +9,4 @@ mongoose.connect(mongoURI!)
 
 export default mongoose.connection;
 
-// mongodb+srv://hetpatoliya95:YXd8hDfcxxRxTjhk@cluster0.ulgeufu.mongodb.net/bookmanagemet
 // mongodb://localhost:27017/bookmanagement

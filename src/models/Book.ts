@@ -1,7 +1,6 @@
-import mongoose, { Schema } from "mongoose";
-import { Ibook } from "../interfaces/book.interface";
+import mongoose from "mongoose";
 
-const bookSchema: Schema = new Schema({
+const bookSchema = new mongoose.Schema({
     title: { type: String, require: true },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author', require: true },
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', require: true },
@@ -14,4 +13,6 @@ const bookSchema: Schema = new Schema({
     timestamps: true
 });
 
-export default mongoose.model<Ibook>('Book', bookSchema);
+const Book = mongoose.model('Book', bookSchema);
+
+export { Book };

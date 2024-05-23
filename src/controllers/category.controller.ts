@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import { categoryService } from "../services/category.service";
-import { adminIdextended } from '../interfaces/other.interface';
+import { CategoryService } from "../services/category.service";
+import { IRequestExtended } from '../interfaces/Other';
 import { constants } from "../utils/constants";
 
-const categorys = new categoryService();
+const categoryService = new CategoryService();
 
-export class categoryController {
+export class CategoryController {
 
-    public async addCategory(req: adminIdextended, res: Response): Promise<void> {
+    public async addCategory(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
-            const { statusCode, message } = await categorys.addCategory(req.body, adminId!);
-            res.status(statusCode).json({ message: message });
+            const data = await categoryService.addCategory(req.body, adminId!);
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -22,8 +22,8 @@ export class categoryController {
 
     public async getAllCategory(req: Request, res: Response): Promise<void> {
         try {
-            const { allCategories, statusCode } = await categorys.getAllCategory();
-            res.status(statusCode).json({ message: allCategories });
+            const data = await categoryService.getAllCategory();
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -32,12 +32,12 @@ export class categoryController {
         }
     }
 
-    public async updateCategory(req: adminIdextended, res: Response): Promise<void> {
+    public async updateCategory(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
             const categoryId = req.params.categoryId;
-            const { statusCode, message } = await categorys.updateCategory(req.body, categoryId, adminId!);
-            res.status(statusCode).json({ message: message });
+            const data = await categoryService.updateCategory(req.body, categoryId, adminId!);
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -49,8 +49,8 @@ export class categoryController {
     public async deleteCategory(req: Request, res: Response): Promise<void> {
         try {
             const categoryId = req.params.categoryId;
-            const { statusCode, message } = await categorys.deleteCategory(categoryId);
-            res.status(statusCode).json({ message: message });
+            const data = await categoryService.deleteCategory(categoryId);
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
@@ -65,9 +65,9 @@ export class categoryController {
             const limit = parseInt(req.query.limit as string) || 10;
             const searchQuery = req.query.search as string;
 
-            const { categories, totalCategories } = await categorys.getAllCategoryPaginated(page, limit, searchQuery);
+            const data = await categoryService.getAllCategoryPaginated(page, limit, searchQuery);
 
-            res.status(constants.SUCCESS_STATUS_CODE).json({ categories, totalCategories });
+            res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
                 status: constants.ERROR_STATUS,
