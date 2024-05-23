@@ -1,7 +1,9 @@
 import { IBook } from '../interfaces/Book';
 import { Book } from '../models/Book';
 import { constants } from '../utils/constants';
+import { injectable } from 'inversify';
 
+@injectable()
 export class BookService {
 
     public async addBook(book: IBook, adminId: String): Promise<{ statusCode: number, message: string, book?: IBook }> {

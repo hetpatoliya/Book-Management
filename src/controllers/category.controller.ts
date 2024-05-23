@@ -2,15 +2,20 @@ import { Request, Response } from "express";
 import { CategoryService } from "../services/category.service";
 import { IRequestExtended } from '../interfaces/Other';
 import { constants } from "../utils/constants";
+import { controller, httpPost, httpGet, httpDelete, httpPatch } from 'inversify-express-utils';
+import { inject } from 'inversify';
+import authenticateAdmin from "../middleware/authAdmin";
 
-const categoryService = new CategoryService();
-
+@controller('/admin/category', authenticateAdmin)
 export class CategoryController {
 
+    constructor(@inject(CategoryService) public categoryService: CategoryService) { }
+
+    @httpPost('/addCategory')
     public async addCategory(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
-            const data = await categoryService.addCategory(req.body, adminId!);
+            const data = await this.categoryService.addCategory(req.body, adminId!);
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -20,9 +25,10 @@ export class CategoryController {
         }
     }
 
+    @httpGet('/getAllCategory')
     public async getAllCategory(req: Request, res: Response): Promise<void> {
         try {
-            const data = await categoryService.getAllCategory();
+            const data = await this.categoryService.getAllCategory();
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -32,11 +38,12 @@ export class CategoryController {
         }
     }
 
+    @httpPost('/updateCategory/:categoryId')
     public async updateCategory(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
             const categoryId = req.params.categoryId;
-            const data = await categoryService.updateCategory(req.body, categoryId, adminId!);
+            const data = await this.categoryService.updateCategory(req.body, categoryId, adminId!);
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -46,10 +53,11 @@ export class CategoryController {
         }
     }
 
+    @httpDelete('/deleteCategory/:categoryId')
     public async deleteCategory(req: Request, res: Response): Promise<void> {
         try {
             const categoryId = req.params.categoryId;
-            const data = await categoryService.deleteCategory(categoryId);
+            const data = await this.categoryService.deleteCategory(categoryId);
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -59,13 +67,14 @@ export class CategoryController {
         }
     };
 
+    @httpGet('/getCategoriesPeginated')
     public async getAllCategoryPaginated(req: Request, res: Response): Promise<void> {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const searchQuery = req.query.search as string;
 
-            const data = await categoryService.getAllCategoryPaginated(page, limit, searchQuery);
+            const data = await this.categoryService.getAllCategoryPaginated(page, limit, searchQuery);
 
             res.status(data.statusCode).json(data);
         } catch (error: any) {

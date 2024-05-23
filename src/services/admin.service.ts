@@ -3,7 +3,9 @@ import { IAdmin } from '../interfaces/Admin';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { constants } from '../utils/constants';
+import { injectable } from 'inversify';
 
+@injectable()
 export class AdminServices {
 
     public async signUp(admin: IAdmin): Promise<{ statusCode: number, message: string, admin?: IAdmin }> {

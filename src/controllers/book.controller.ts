@@ -2,15 +2,20 @@ import { Request, Response } from "express";
 import { IRequestExtended } from '../interfaces/Other';
 import { BookService } from "../services/book.service";
 import { constants } from "../utils/constants";
+import { controller, httpGet, httpPatch, httpDelete, httpPost } from "inversify-express-utils";
+import { inject } from "inversify";
+import authenticateAdmin from "../middleware/authAdmin";
 
-const bookService = new BookService();
-
+@controller('/admin/book', authenticateAdmin)
 export class BookController {
 
+    constructor(@inject(BookService) public bookService: BookService) { }
+
+    @httpPost('/addBook')
     public async addBook(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
-            const data = await bookService.addBook(req.body, adminId!);
+            const data = await this.bookService.addBook(req.body, adminId!);
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -20,9 +25,10 @@ export class BookController {
         }
     }
 
+    @httpGet('/getAllBooks')
     public async retrieveBook(req: Request, res: Response): Promise<void> {
         try {
-            const data = await bookService.retrieveBook();
+            const data = await this.bookService.retrieveBook();
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -32,11 +38,12 @@ export class BookController {
         }
     }
 
+    @httpPatch('/updateBook/:bookId')
     public async updateBook(req: IRequestExtended, res: Response): Promise<void> {
         try {
             const adminId = req.adminId;
             const bookId = req.params.bookId;
-            const data = await bookService.updateBook(req.body, bookId, adminId!);
+            const data = await this.bookService.updateBook(req.body, bookId, adminId!);
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -46,10 +53,11 @@ export class BookController {
         }
     }
 
+    @httpDelete('/deleteBook/:bookId')
     public async deleteBook(req: Request, res: Response) {
         try {
             const bookId = req.params.bookId;
-            const data = await bookService.deleteBook(bookId!);
+            const data = await this.bookService.deleteBook(bookId!);
             res.status(data.statusCode).json(data);
         } catch (error: any) {
             res.status(constants.ERROR_STATUS_CODE).json({
@@ -59,6 +67,7 @@ export class BookController {
         }
     }
 
+    @httpGet('/getAllBooksPeginated')
     public async getAllBooksPaginated(req: Request, res: Response): Promise<void> {
         try {
             const { page, limit, filters } = req.query;
@@ -73,7 +82,7 @@ export class BookController {
                 parsedFilters = filters;
             }
 
-            const data = await bookService.getAllBooksPaginated(parsedPage, parsedLimit, searchQuery as string, parsedFilters);
+            const data = await this.bookService.getAllBooksPaginated(parsedPage, parsedLimit, searchQuery as string, parsedFilters);
 
             res.status(data.statusCode).json(data);
         } catch (error: any) {

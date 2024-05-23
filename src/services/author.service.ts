@@ -2,7 +2,9 @@ import { Author } from '../models/Author';
 import { IAuthor } from '../interfaces/Author';
 import { constants } from '../utils/constants';
 import mongoose, { ObjectId } from 'mongoose';
+import { injectable } from 'inversify';
 
+@injectable()
 export class AuthorService {
 
     public async createAuthor(author: IAuthor, adminId: string): Promise<{ statusCode: number, message: String, author?: IAuthor }> {

@@ -1,7 +1,9 @@
 import { Category } from '../models/Category';
 import { ICategory } from '../interfaces/Category';
 import { constants } from '../utils/constants';
+import { injectable } from 'inversify';
 
+@injectable()
 export class CategoryService {
 
     public async addCategory(category: ICategory, adminId: String): Promise<{ statusCode: number, message: string, category?: ICategory }> {
